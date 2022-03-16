@@ -1,0 +1,96 @@
+name: CI
+
+# Enable Buildkit and let compose use it to speed up image building
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+
+      # Run all pre-commit hooks on aflakell the files.
+      # Getting only staged files can be tricky in case a new PR is opened
+      # since the action is run on a branch in detached head state
+      - name: Install and Run Pre-commit
+        uses: pre-commit/action@v2.0.3
+
+  # With no caching at all the entire ci process takes 4m 30s to complete!
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    env:
+      # postgres://user:password@host:port/database
+      DATABASE_URL: "postgres://postgres:postgres@localhost:5432/postgres"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+
+      - name: Get pip cache dir
+        id: pip-cache-location
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: Cache pip Project Dependencies
+        uses: actions/cache@v2
+        with:
+          # Get the location of pip cache dir
+          path: ${{ steps.pip-cache-location.outputs.dir }}
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+
+      - name: Running tests
+        run: |
+          coverage run --source=. ./manage.py test
+          coverage xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          fail_ci_if_error: true
