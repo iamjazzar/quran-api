@@ -74,8 +74,12 @@ class Aya(BaseModel):
     Printing Complex as of 03/16/2022 (https://qurancomplex.gov.sa/techquran/dev/)
     """
 
-    sora = models.ForeignKey(Sora, null=False, on_delete=models.PROTECT)
-    juz = models.ForeignKey(Juz, null=False, on_delete=models.PROTECT)
+    sora = models.ForeignKey(
+        Sora, related_name="ayas", null=False, on_delete=models.PROTECT
+    )
+    juz = models.ForeignKey(
+        Juz, related_name="ayas", null=False, on_delete=models.PROTECT
+    )
     text = models.TextField(
         editable=False,
         verbose_name=_(

@@ -34,13 +34,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party libraries
+    "rest_framework",
     "hitcount",
     # Our apps
     "quran",
@@ -150,6 +150,22 @@ HITCOUNT_EXCLUDE_USER_GROUP = ()
 # management command. This setting specifies a timedelta within which to keep/save
 # Hits. Any Hit older than the time specified will be removed from the Hits table.
 HITCOUNT_KEEP_HIT_IN_DATABASE = {"days": 30}
+
+# Django REST framework
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    # For more info about API versioning, visit:
+    # https://www.django-rest-framework.org/api-guide/versioning/#namespaceversioning
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.CursorPagination",
+    "COERCE_DECIMAL_TO_STRING": False,
+    "PAGE_SIZE": 100,
+}
+
+if not DEBUG:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
+        "rest_framework.renderers.JSONRenderer",
+    ]
 
 # Logging
 if not DEBUG:
