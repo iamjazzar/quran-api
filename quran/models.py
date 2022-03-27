@@ -15,6 +15,8 @@ class Juz(BaseModel):
     Printing Complex as of 03/16/2022 (https://qurancomplex.gov.sa/techquran/dev/)
     """
 
+    number_worded_ar = models.CharField(max_length=25, null=True, blank=True)
+    number_worded_en = models.CharField(max_length=14, null=True, blank=True)
     number = models.PositiveSmallIntegerField(
         unique=True,
         editable=False,

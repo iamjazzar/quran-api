@@ -32,11 +32,13 @@ class TestJuzViewSet(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
-        self.assertEqual(4, len(response.data))
+        self.assertEqual(6, len(response.data))
 
         instance = Juz.objects.get(number=juz_number)
         self.assertEqual(str(instance.id), response.data["id"])
         self.assertEqual(instance.number, response.data["number"])
+        self.assertEqual(instance.number_worded_ar, response.data["number_worded_ar"])
+        self.assertEqual(instance.number_worded_en, response.data["number_worded_en"])
         self.assertEqual(instance.created, parse_datetime(response.data["created"]))
         self.assertEqual(instance.updated, parse_datetime(response.data["updated"]))
 
