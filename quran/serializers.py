@@ -6,7 +6,14 @@ from quran import models
 class JuzSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Juz
-        fields = ["id", "number", "created", "updated"]
+        fields = [
+            "id",
+            "number",
+            "number_worded_ar",
+            "number_worded_en",
+            "created",
+            "updated",
+        ]
 
 
 class SoraSerializer(serializers.HyperlinkedModelSerializer):
