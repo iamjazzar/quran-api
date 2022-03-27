@@ -31,7 +31,7 @@ class SoraViewSet(
     @action(methods=["GET"], detail=True)
     def ayas(self, *args, **kwargs):
         sora = self.get_object()
-        ayas = sora.ayas.all()
+        ayas = sora.ayas.all().order_by("number")
 
         serializer = serializers.AyaSerializer(ayas, many=True)
         return Response(serializer.data)
