@@ -7,6 +7,7 @@ from django.utils.dateparse import parse_datetime
 from rest_framework import status
 
 from quran.models import Aya, Juz, Sora
+from quran.pagination import NumberCursorPagination
 
 
 class TestJuzViewSet(TestCase):
@@ -98,6 +99,28 @@ class TestAyaViewSet(TestCase):
 
         self.assertIn("previous", response.data)
         self.assertIsNone(response.data["previous"])
+
+    def test_pagination_max(self):
+        url = reverse("aya-list")
+        query = (
+            f"?{NumberCursorPagination.page_size_query_param}"
+            f"={NumberCursorPagination.max_page_size}"
+        )
+        response = self.client.get(url + query)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(
+            NumberCursorPagination.max_page_size, len(response.data["results"])
+        )
+
+    def test_pagination_specific(self):
+        url = reverse("aya-list")
+        results_per_page = 10
+        query = f"?{NumberCursorPagination.page_size_query_param}={results_per_page}"
+        response = self.client.get(url + query)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(results_per_page, len(response.data["results"]))
 
     def test_retrieve(self):
         # Pick a random aya
@@ -193,6 +216,26 @@ class TestSoraViewSet(TestCase):
 
         self.assertIn("previous", response.data)
         self.assertIsNone(response.data["previous"])
+
+    def test_pagination_max(self):
+        url = reverse("sora-list")
+        query = (
+            f"?{NumberCursorPagination.page_size_query_param}"
+            f"={NumberCursorPagination.max_page_size}"
+        )
+        response = self.client.get(url + query)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(114, len(response.data["results"]))
+
+    def test_pagination_specific(self):
+        url = reverse("sora-list")
+        results_per_page = 10
+        query = f"?{NumberCursorPagination.page_size_query_param}={results_per_page}"
+        response = self.client.get(url + query)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+        self.assertEqual(results_per_page, len(response.data["results"]))
 
     def test_retrieve(self):
         # Pick a random sora
