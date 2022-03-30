@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from quran import pagination, serializers
 from quran.models import Aya, Juz, Sora
@@ -55,3 +56,18 @@ class AyaViewSet(
     queryset = Aya.objects.all()
     serializer_class = serializers.AyaSerializer
     pagination_class = pagination.NumberCursorPagination
+
+
+class QuranMetadataView(APIView):
+    """
+    View to list all quran metadata.
+    """
+
+    def get(self, *args, **kwargs):
+        return Response(
+            {
+                "aya_count": Aya.objects.count(),
+                "sora_count": Sora.objects.count(),
+                "juz_count": Juz.objects.count(),
+            }
+        )

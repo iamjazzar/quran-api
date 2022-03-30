@@ -384,3 +384,16 @@ class TestSoraViewSet(TestCase):
         self.assertEqual(
             response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED, msg=response.data
         )
+
+
+class TestQuranMetadataView(TestCase):
+    def test_get(self):
+        url = reverse("metadata")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
+
+        self.assertEqual(3, len(response.data))
+        self.assertEqual(response.data["aya_count"], Aya.objects.count())
+        self.assertEqual(response.data["sora_count"], Sora.objects.count())
+        self.assertEqual(response.data["juz_count"], Juz.objects.count())
