@@ -12,7 +12,7 @@ from quran.pagination import NumberCursorPagination
 
 class TestJuzViewSet(TestCase):
     def test_list(self):
-        url = reverse("juz-list")
+        url = reverse("quran:juz-list")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
@@ -29,7 +29,7 @@ class TestJuzViewSet(TestCase):
 
     def test_retrieve(self):
         juz_number = 13
-        url = reverse("juz-detail", kwargs={"number": juz_number})
+        url = reverse("quran:juz-detail", kwargs={"number": juz_number})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
@@ -45,7 +45,7 @@ class TestJuzViewSet(TestCase):
 
     def test_delete(self):
         juz_number = 13
-        url = reverse("juz-detail", kwargs={"number": juz_number})
+        url = reverse("quran:juz-detail", kwargs={"number": juz_number})
         response = self.client.delete(url)
 
         self.assertEqual(
@@ -57,7 +57,7 @@ class TestJuzViewSet(TestCase):
 
     def test_create(self):
         juz_number = 31
-        url = reverse("juz-list")
+        url = reverse("quran:juz-list")
         response = self.client.post(url, data={"number": juz_number})
 
         self.assertEqual(
@@ -70,7 +70,7 @@ class TestJuzViewSet(TestCase):
 
     def test_update(self):
         juz_number = 13
-        url = reverse("juz-detail", kwargs={"number": juz_number})
+        url = reverse("quran:juz-detail", kwargs={"number": juz_number})
 
         response = self.client.patch(url)
         self.assertEqual(
@@ -85,7 +85,7 @@ class TestJuzViewSet(TestCase):
 
 class TestAyaViewSet(TestCase):
     def test_list(self):
-        url = reverse("aya-list")
+        url = reverse("quran:aya-list")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
@@ -101,7 +101,7 @@ class TestAyaViewSet(TestCase):
         self.assertIsNone(response.data["previous"])
 
     def test_pagination_max(self):
-        url = reverse("aya-list")
+        url = reverse("quran:aya-list")
         query = (
             f"?{NumberCursorPagination.page_size_query_param}"
             f"={NumberCursorPagination.max_page_size}"
@@ -114,7 +114,7 @@ class TestAyaViewSet(TestCase):
         )
 
     def test_pagination_specific(self):
-        url = reverse("aya-list")
+        url = reverse("quran:aya-list")
         results_per_page = 10
         query = f"?{NumberCursorPagination.page_size_query_param}={results_per_page}"
         response = self.client.get(url + query)
@@ -126,7 +126,7 @@ class TestAyaViewSet(TestCase):
         # Pick a random aya
         aya = Aya.objects.order_by("?").first()
 
-        url = reverse("aya-detail", kwargs={"pk": aya.pk})
+        url = reverse("quran:aya-detail", kwargs={"pk": aya.pk})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
@@ -149,7 +149,7 @@ class TestAyaViewSet(TestCase):
     def test_delete(self):
         # Pick a random aya
         aya = Aya.objects.order_by("?").first()
-        url = reverse("aya-detail", kwargs={"pk": aya.pk})
+        url = reverse("quran:aya-detail", kwargs={"pk": aya.pk})
         response = self.client.delete(url)
 
         self.assertEqual(
@@ -160,7 +160,7 @@ class TestAyaViewSet(TestCase):
         Aya.objects.get(pk=aya.pk)
 
     def test_create(self):
-        url = reverse("aya-list")
+        url = reverse("quran:aya-list")
         new_object_id = uuid4()
 
         response = self.client.post(
@@ -187,7 +187,7 @@ class TestAyaViewSet(TestCase):
     def test_update(self):
         # Pick a random aya
         aya = Aya.objects.order_by("?").first()
-        url = reverse("aya-detail", kwargs={"pk": aya.pk})
+        url = reverse("quran:aya-detail", kwargs={"pk": aya.pk})
 
         response = self.client.patch(url)
         self.assertEqual(
@@ -202,7 +202,7 @@ class TestAyaViewSet(TestCase):
 
 class TestSoraViewSet(TestCase):
     def test_list(self):
-        url = reverse("sora-list")
+        url = reverse("quran:sora-list")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
@@ -218,7 +218,7 @@ class TestSoraViewSet(TestCase):
         self.assertIsNone(response.data["previous"])
 
     def test_pagination_max(self):
-        url = reverse("sora-list")
+        url = reverse("quran:sora-list")
         query = (
             f"?{NumberCursorPagination.page_size_query_param}"
             f"={NumberCursorPagination.max_page_size}"
@@ -229,7 +229,7 @@ class TestSoraViewSet(TestCase):
         self.assertEqual(114, len(response.data["results"]))
 
     def test_pagination_specific(self):
-        url = reverse("sora-list")
+        url = reverse("quran:sora-list")
         results_per_page = 10
         query = f"?{NumberCursorPagination.page_size_query_param}={results_per_page}"
         response = self.client.get(url + query)
@@ -241,7 +241,7 @@ class TestSoraViewSet(TestCase):
         # Pick a random sora
         sora = Sora.objects.order_by("?").first()
 
-        url = reverse("sora-detail", kwargs={"number": sora.number})
+        url = reverse("quran:sora-detail", kwargs={"number": sora.number})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
@@ -262,13 +262,13 @@ class TestSoraViewSet(TestCase):
         # Pick a random sora
         sora = Sora.objects.order_by("?").first()
 
-        url = reverse("sora-ayas", kwargs={"number": sora.number})
+        url = reverse("quran:sora-ayas", kwargs={"number": sora.number})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
         self.assertEqual(sora.ayas.count(), len(response.data))
 
-        aya_response = response.data[randrange(0, sora.ayas.count())]
+        aya_response = response.data[randrange(1, sora.ayas.count())]
         self.assertEqual(11, len(aya_response))
 
         instance = Aya.objects.get(pk=aya_response["id"])
@@ -291,10 +291,10 @@ class TestSoraViewSet(TestCase):
         sora = Sora.objects.order_by("?").first()
 
         url = reverse(
-            "sora-ayas-detail",
+            "quran:sora-ayas-detail",
             kwargs={
                 "number": sora.number,
-                "aya_number": randrange(0, sora.ayas.count()),
+                "aya_number": randrange(1, sora.ayas.count()),
             },
         )
         response = self.client.get(url)
@@ -322,7 +322,7 @@ class TestSoraViewSet(TestCase):
         sora = Sora.objects.order_by("?").first()
 
         url = reverse(
-            "sora-ayas-detail",
+            "quran:sora-ayas-detail",
             kwargs={
                 "number": sora.number,
                 "aya_number": sora.ayas.count() + 10,
@@ -337,7 +337,7 @@ class TestSoraViewSet(TestCase):
     def test_delete(self):
         # Pick a random sora
         sora = Sora.objects.order_by("?").first()
-        url = reverse("sora-detail", kwargs={"number": sora.number})
+        url = reverse("quran:sora-detail", kwargs={"number": sora.number})
         response = self.client.delete(url)
 
         self.assertEqual(
@@ -348,7 +348,7 @@ class TestSoraViewSet(TestCase):
         Sora.objects.get(number=sora.number)
 
     def test_create(self):
-        url = reverse("sora-list")
+        url = reverse("quran:sora-list")
         new_object_id = uuid4()
 
         response = self.client.post(
@@ -372,8 +372,8 @@ class TestSoraViewSet(TestCase):
 
     def test_update(self):
         # Pick a random sora
-        sora = Aya.objects.order_by("?").first()
-        url = reverse("sora-detail", kwargs={"number": sora.number})
+        sora = Sora.objects.order_by("?").first()
+        url = reverse("quran:sora-detail", kwargs={"number": sora.number})
 
         response = self.client.patch(url)
         self.assertEqual(
@@ -388,7 +388,7 @@ class TestSoraViewSet(TestCase):
 
 class TestQuranMetadataView(TestCase):
     def test_get(self):
-        url = reverse("metadata")
+        url = reverse("quran:metadata")
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK, msg=response.data)
