@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party libraries
+    "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
     "rest_framework",
     "hitcount",
     # Our apps
     "quran",
+    "search",
 ]
 
 MIDDLEWARE = [
@@ -166,6 +169,13 @@ if not DEBUG:
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
         "rest_framework.renderers.JSONRenderer",
     ]
+
+
+# Elastic search
+ELASTICSEARCH_DSL = {
+    "default": {"hosts": "elasticsearch:9200"},
+}
+
 
 # Logging
 if not DEBUG:
