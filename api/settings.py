@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import dj_database_url
@@ -172,8 +173,9 @@ if not DEBUG:
 
 
 # Elastic search
+ELASTICSEARCH_HOST = os.environ.get("ELASTICSEARCH_HOST", "localhost:9200")
 ELASTICSEARCH_DSL = {
-    "default": {"hosts": "elasticsearch:9200"},
+    "default": {"hosts": ELASTICSEARCH_HOST},
 }
 
 
