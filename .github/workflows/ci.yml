@@ -55,6 +55,7 @@ jobs:
     env:
       # postgres://user:password@host:port/database
       DATABASE_URL: "postgres://postgres:postgres@localhost:5432/postgres"
+      ELASTICSEARCH_HOST: "http://localhost:9200"
 
     steps:
       - uses: actions/checkout@v3
@@ -63,6 +64,18 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: 3.9
+
+      - name: Configure sysctl limits (For elasticsearch)
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+
+      - name: Run Elasticsearch
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: 8.1.2
 
       - name: Get pip cache dir
         id: pip-cache-location
@@ -84,10 +97,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
 
-      - name: Running tests
-        run: |
-          coverage run --source=. ./manage.py test
-          coverage xml
+      - name: Running migrations
+        run: ./manage.py migrate
+
+      - name: Index elasticsearch
+        run: ./manage.py search_index --rebuild -f
+
+      - name: Run tests
+        run: coverage run --source=. ./manage.py test
+
+      - name: Collect coverage results
+        run: coverage xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
