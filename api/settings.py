@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import dj_database_url
@@ -40,10 +41,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party libraries
+    "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
     "rest_framework",
     "hitcount",
     # Our apps
     "quran",
+    "search",
 ]
 
 MIDDLEWARE = [
@@ -166,6 +170,14 @@ if not DEBUG:
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
         "rest_framework.renderers.JSONRenderer",
     ]
+
+
+# Elastic search
+ELASTICSEARCH_HOST = os.environ.get("ELASTICSEARCH_HOST", "localhost:9200")
+ELASTICSEARCH_DSL = {
+    "default": {"hosts": ELASTICSEARCH_HOST},
+}
+
 
 # Logging
 if not DEBUG:
